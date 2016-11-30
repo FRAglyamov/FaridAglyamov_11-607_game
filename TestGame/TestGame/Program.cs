@@ -4,20 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Xsl;
-using ConsoleGame;
 
-namespace TestGame
+namespace TestGameTry
 {
     class Program
     {
         static Random random = new Random();
         static ConsoleKeyInfo key_info = new ConsoleKeyInfo();
-        static Thread backgroundGame = new Thread(background);
-        static Thread MoveCar = new Thread(carsearch);
+        //static object Locker = new object();
         static bool game_over = false;
-        static int height = Console.WindowHeight - 5;
-        static int width = Console.WindowWidth / 2;
+        static int height = 20;
+        static int width = 16;
         static int framerate = 1000;
         static int FrogX = width / 2, FrogY = height - 1;
         static char frog = '@';
@@ -52,11 +49,7 @@ namespace TestGame
         static void car_location_spawn()
         {
             car_location = random.Next(0, (height - 1));
-            //Console.SetCursorPosition((width-1), car_location);
-            //Console.Write(car);
             game_ground[car_location, (width - 1)] = car;
-            printmap();
-            //Thread.Sleep(framerate);
         }
 
         static void printmap()
@@ -69,6 +62,7 @@ namespace TestGame
                     Console.Write(game_ground[i, j]);
                 }
             }
+            Frame();
         }
 
         static void LeftArrowEvent()
@@ -121,11 +115,13 @@ namespace TestGame
                             game_ground[i, j] = ground;
                             if (game_ground[i, j - 1] == frog)
                             {
-                                game_over = true;
+                               // game_over = true;
                             }
                             if (j != 0)
                                 game_ground[i, j - 1] = car; //moves car left
                         }
+                        Console.Clear();
+                        printmap();
                         Thread.Sleep(framerate);
                     }
                 }
@@ -133,61 +129,80 @@ namespace TestGame
         }
         static void FrogMoveEvent()
         {
-            key_info = Console.ReadKey(true);
-            switch (key_info.Key)
+            while(true)
             {
-                case ConsoleKey.RightArrow:
-                    RightArrowEvent();
-                    break;
-                case ConsoleKey.LeftArrow:
-                    LeftArrowEvent();
-                    break;
-                case ConsoleKey.UpArrow:
-                    UpArrowEvent();
-                    break;
-                case ConsoleKey.DownArrow:
-                    DownArrowEvent();
-                    break;
+                if(Console.KeyAvailable == true)
+                {
+                    key_info = Console.ReadKey(true);
+                    switch (key_info.Key)
+                    {
+                        case ConsoleKey.RightArrow:
+                            RightArrowEvent();
+                            break;
+                        case ConsoleKey.LeftArrow:
+                            LeftArrowEvent();
+                            break;
+                        case ConsoleKey.UpArrow:
+                            UpArrowEvent();
+                            break;
+                        case ConsoleKey.DownArrow:
+                            DownArrowEvent();
+                            break;
+                    }
+                    Console.Clear();
+                    printmap();
+                }
             }
+        }
+
+        static void IfFrogMoveEvent()
+        {
+            key_info = Console.ReadKey(true);
+            if (key_info.Key == ConsoleKey.RightArrow)
+                RightArrowEvent();
+            else if (key_info.Key == ConsoleKey.LeftArrow)
+                LeftArrowEvent();
+            else if (key_info.Key == ConsoleKey.UpArrow)
+                UpArrowEvent();
+            else if (key_info.Key == ConsoleKey.DownArrow)
+                DownArrowEvent();
+            Console.Clear();
+            printmap();
         }
 
         static void background()
         {
-            while (!game_over)
+            while (true)
             {
-                Console.Clear();
-                Frame();
+                Console.SetCursorPosition(10, 10);
+                Console.WriteLine("thread!");
+                Thread.Sleep(500);
                 car_location_spawn();
-                //carsearch();
-                //Console.SetCursorPosition(0, 0);
-                //Console.SetCursorPosition(FrogY, FrogX);
-                //Console.Write(frog);
+                carsearch();
+                //Console.Clear();
+                //printmap();
                 Thread.Sleep(framerate);
             }
         }
 
 
-        static void Main(string[] args)
+        static void Main()
         {
-            //Renderer renderer = new Renderer();
-            //renderer.Draw();
-            //renderer.Start();
             Console.CursorVisible = false;
             Field();
-            Frame();
-
-            //backgroundGame.Start();
+            //Task backgroundGame2 = new Task(background);
+            Thread backgroundGame = new Thread(background);
+            backgroundGame.Start();
             //backgroundGame.IsBackground = true;
-            //car_location_spawn();
-            MoveCar.Start();
-            MoveCar.IsBackground = true;
-            while (!game_over)
-            {
-                FrogMoveEvent();
-                printmap();
-                car_location_spawn();
-                //carsearch();
-            }
+            //Task FrogMove2 = new Task(FrogMoveEvent);
+            Thread FrogMove = new Thread(FrogMoveEvent);
+            FrogMove.Start();
+            //Task.Run(new Action(background));
+
+            //while (!game_over)
+            //{
+                //FrogMoveEvent();
+            //}
         }
     }
 }
