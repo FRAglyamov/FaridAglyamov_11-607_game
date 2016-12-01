@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TestGameTry
+namespace Frogger
 {
     class Program
     {
@@ -22,7 +22,9 @@ namespace TestGameTry
         static char ground = ' ';
         static int car_location;
         static char[,] game_ground = new char[height, width];
-        static void Frame()
+
+
+        static void Frame() // Прорисовка рамки
         {
             for (int i = 0; i < height; i++)
             {
@@ -30,12 +32,12 @@ namespace TestGameTry
                 Console.WriteLine('|');
             }
             Console.SetCursorPosition(0, height);
-            for(int j = 0; j < width; j++)
+            for (int j = 0; j < width; j++)
             {
                 Console.Write('-');
             }
         }
-        static void Field()
+        static void Field() // Начальное(пустое) поле
         {
             for (int i = 0; i < height; i++)
             {
@@ -46,13 +48,13 @@ namespace TestGameTry
             }
         }
 
-        static void car_location_spawn()
+        static void CarSpawn() // Рандомный спавн машин (не нужен)
         {
             car_location = random.Next(0, (height - 1));
             game_ground[car_location, (width - 1)] = car;
         }
 
-        static void printmap()
+        static void PrintMap() // Прорисовка поля игры
         {
             for (int i = 0; i < height; i++)
             {
@@ -65,7 +67,55 @@ namespace TestGameTry
             Frame();
         }
 
-        static void LeftArrowEvent()
+        static void ShowMenu() // Запуск меню
+        {
+            Console.Clear();
+            Console.Write("\n\n");
+            Console.Write(" Frogger Game \n\n\n");
+            Console.Write(" Press 'S' for start game!\n");
+            Console.Write(" Press 'H' for showing rule!\n");
+            Console.Write(" Press 'Esc' for exit!\n");
+            key_info = Console.ReadKey(true);
+            switch (key_info.Key)
+            {
+                case ConsoleKey.S:
+                    StartGame();
+                    break;
+                case ConsoleKey.H:
+                    HowToPlay();
+                    break;
+                case ConsoleKey.Escape:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    ShowMenu();
+                    break;
+            }
+        }
+
+        static void HowToPlay() // Меню с управлением и целью игры
+        {
+            Console.Clear();
+            Console.Write("\n\n\n\n");
+            Console.Write(" Key Settings: \n");
+            Console.Write(" Use Arrows for moving \n\n");
+            Console.Write(" Mission: \n");
+            Console.Write(" You must cross the road without falling under car\n\n\n\n");
+            Console.Write(" Press 'B' for returning back\n");
+            key_info = Console.ReadKey(true);
+            switch (key_info.Key)
+            {
+                case ConsoleKey.B:
+                    ShowMenu();
+                    break;
+                default:
+                    HowToPlay();
+                    break;
+            }
+        }
+
+
+        static void LeftArrowEvent() // Движение лягушки влево
         {
             if (FrogX != 0)
             {
@@ -74,16 +124,16 @@ namespace TestGameTry
                 game_ground[FrogY, FrogX] = frog;
             }
         }
-        static void RightArrowEvent()
+        static void RightArrowEvent() // Движение лягушки вправо
         {
-            if (FrogX != (width - 1)) 
+            if (FrogX != (width - 1))
             {
                 game_ground[FrogY, FrogX] = ground;
                 FrogX++;
                 game_ground[FrogY, FrogX] = frog;
             }
         }
-        static void UpArrowEvent()
+        static void UpArrowEvent() // Движение лягушки вверх
         {
             if (FrogY != 0)
             {
@@ -92,9 +142,9 @@ namespace TestGameTry
                 game_ground[FrogY, FrogX] = frog;
             }
         }
-        static void DownArrowEvent()
+        static void DownArrowEvent() // Движение лягушки вниз
         {
-            if (FrogY != (height - 1)) 
+            if (FrogY != (height - 1))
             {
                 game_ground[FrogY, FrogX] = ground;
                 FrogY++;
@@ -102,7 +152,7 @@ namespace TestGameTry
             }
         }
 
-        static void carsearch()
+        static void CarSearch() // Поиск машины в массиве и её передвижение
         {
             while (!game_over)
             {
@@ -110,28 +160,28 @@ namespace TestGameTry
                 {
                     for (int j = 0; j < width - 1; j++)
                     {
-                        if (game_ground[i, j] == car) // searches for a car
+                        if (game_ground[i, j] == car)
                         {
                             game_ground[i, j] = ground;
                             if (game_ground[i, j - 1] == frog)
                             {
-                               // game_over = true;
+                                game_over = true;
                             }
                             if (j != 0)
-                                game_ground[i, j - 1] = car; //moves car left
+                                game_ground[i, j - 1] = car;
                         }
                         Console.Clear();
-                        printmap();
+                        PrintMap();
                         Thread.Sleep(framerate);
                     }
                 }
             }
         }
-        static void FrogMoveEvent()
+        static void FrogMoveEvent() // Общий метод движения лягушки
         {
-            while(true)
+            while (!game_over)
             {
-                if(Console.KeyAvailable == true)
+                if (Console.KeyAvailable == true)
                 {
                     key_info = Console.ReadKey(true);
                     switch (key_info.Key)
@@ -148,61 +198,43 @@ namespace TestGameTry
                         case ConsoleKey.DownArrow:
                             DownArrowEvent();
                             break;
+                        case ConsoleKey.Escape:
+                            Environment.Exit(0);
+                            break;
                     }
                     Console.Clear();
-                    printmap();
+                    PrintMap();
                 }
             }
         }
 
-        static void IfFrogMoveEvent()
+        static void EnvironmentEvent()
         {
-            key_info = Console.ReadKey(true);
-            if (key_info.Key == ConsoleKey.RightArrow)
-                RightArrowEvent();
-            else if (key_info.Key == ConsoleKey.LeftArrow)
-                LeftArrowEvent();
-            else if (key_info.Key == ConsoleKey.UpArrow)
-                UpArrowEvent();
-            else if (key_info.Key == ConsoleKey.DownArrow)
-                DownArrowEvent();
-            Console.Clear();
-            printmap();
-        }
-
-        static void background()
-        {
-            while (true)
+            while (!game_over)
             {
-                Console.SetCursorPosition(10, 10);
-                Console.WriteLine("thread!");
-                Thread.Sleep(500);
-                car_location_spawn();
-                carsearch();
-                //Console.Clear();
-                //printmap();
+                CarSpawn();
+                CarSearch();
                 Thread.Sleep(framerate);
             }
         }
 
+        static void StartGame() // Запуск игры
+        {
+            Field();
+            Thread backgroundGame = new Thread(EnvironmentEvent);
+            backgroundGame.Start();
+            Thread FrogMove = new Thread(FrogMoveEvent);
+            FrogMove.Start();
+        }
+
+
+
 
         static void Main()
         {
+            Console.Title = "Frogger Game";
             Console.CursorVisible = false;
-            Field();
-            //Task backgroundGame2 = new Task(background);
-            Thread backgroundGame = new Thread(background);
-            backgroundGame.Start();
-            //backgroundGame.IsBackground = true;
-            //Task FrogMove2 = new Task(FrogMoveEvent);
-            Thread FrogMove = new Thread(FrogMoveEvent);
-            FrogMove.Start();
-            //Task.Run(new Action(background));
-
-            //while (!game_over)
-            //{
-                //FrogMoveEvent();
-            //}
+            ShowMenu();
         }
     }
 }

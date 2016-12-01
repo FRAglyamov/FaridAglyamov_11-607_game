@@ -1,0 +1,6 @@
+C:\MVS Project\Frogger\Frogger\bin\Debug\Frogger.exe.config
+C:\MVS Project\Frogger\Frogger\bin\Debug\Frogger.exe
+C:\MVS Project\Frogger\Frogger\bin\Debug\Frogger.pdb
+C:\MVS Project\Frogger\Frogger\obj\Debug\Frogger.csprojResolveAssemblyReference.cache
+C:\MVS Project\Frogger\Frogger\obj\Debug\Frogger.exe
+C:\MVS Project\Frogger\Frogger\obj\Debug\Frogger.pdb

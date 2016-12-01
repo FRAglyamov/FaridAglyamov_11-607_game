@@ -1,6 +1,0 @@
-C:\MVS Project\TestGame\TestGame\bin\Debug\TestGame.exe.config
-C:\MVS Project\TestGame\TestGame\bin\Debug\TestGame.exe
-C:\MVS Project\TestGame\TestGame\bin\Debug\TestGame.pdb
-C:\MVS Project\TestGame\TestGame\obj\Debug\TestGame.csprojResolveAssemblyReference.cache
-C:\MVS Project\TestGame\TestGame\obj\Debug\TestGame.exe
-C:\MVS Project\TestGame\TestGame\obj\Debug\TestGame.pdb
