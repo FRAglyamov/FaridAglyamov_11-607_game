@@ -11,11 +11,14 @@ namespace Frogger
     {
         static Random random = new Random();
         static ConsoleKeyInfo key_info = new ConsoleKeyInfo();
-        //static object Locker = new object();
         static bool game_over = false;
-        static int height = 20;
-        static int width = 16;
-        static int framerate = 1000;
+        static int height = 18;
+        static int width = 30;
+        static int framerate = 700;
+        static int sum = 0;
+        static int life = 5;
+        static int score = 0;
+        static int z = 666;
         static int FrogX = width / 2, FrogY = height - 1;
         static char frog = '@';
         static char car = 'O';
@@ -37,6 +40,7 @@ namespace Frogger
                 Console.Write('-');
             }
         }
+
         static void Field() // Начальное(пустое) поле
         {
             for (int i = 0; i < height; i++)
@@ -48,10 +52,10 @@ namespace Frogger
             }
         }
 
-        static void CarSpawn() // Рандомный спавн машин (не нужен)
+        static void CarSpawn() // Рандомный спавн машин
         {
-            car_location = random.Next(0, (height - 1));
-            game_ground[car_location, (width - 1)] = car;
+            car_location = random.Next(1, (height - 10));
+            game_ground[car_location, (width - 2)] = car;
         }
 
         static void PrintMap() // Прорисовка поля игры
@@ -65,6 +69,7 @@ namespace Frogger
                 }
             }
             Frame();
+            Console.Write("Lives: " + life + "  Score: " + score);
         }
 
         static void ShowMenu() // Запуск меню
@@ -114,69 +119,177 @@ namespace Frogger
             }
         }
 
+        static void ReturnFrogToStartPosition()
+        {
+            game_ground[FrogY, FrogX] = ground;
+            FrogX = width / 2;
+            FrogY = height - 1;
+            game_ground[FrogY, FrogX] = frog;
+        }
+
 
         static void LeftArrowEvent() // Движение лягушки влево
         {
             if (FrogX != 0)
             {
-                game_ground[FrogY, FrogX] = ground;
-                FrogX--;
-                game_ground[FrogY, FrogX] = frog;
+                if (game_ground[FrogY, FrogX - 1] == car)
+                {
+                    ReturnFrogToStartPosition();
+                    life -= 1; // -жизнь
+                }
+                else
+                {
+                    game_ground[FrogY, FrogX] = ground;
+                    FrogX--;
+                    game_ground[FrogY, FrogX] = frog;
+                }
             }
         }
         static void RightArrowEvent() // Движение лягушки вправо
         {
             if (FrogX != (width - 1))
             {
-                game_ground[FrogY, FrogX] = ground;
-                FrogX++;
-                game_ground[FrogY, FrogX] = frog;
+                if (game_ground[FrogY, FrogX + 1] == car)
+                {
+                    ReturnFrogToStartPosition();
+                    life -= 1; // -жизнь
+                }
+                else
+                {
+                    game_ground[FrogY, FrogX] = ground;
+                    FrogX++;
+                    game_ground[FrogY, FrogX] = frog;
+                }
             }
         }
         static void UpArrowEvent() // Движение лягушки вверх
         {
             if (FrogY != 0)
             {
-                game_ground[FrogY, FrogX] = ground;
-                FrogY--;
-                game_ground[FrogY, FrogX] = frog;
+                if (game_ground[FrogY - 1, FrogX] == car)
+                {
+                    ReturnFrogToStartPosition();
+                    life -= 1; // -жизнь
+                }
+                else
+                {
+                    game_ground[FrogY, FrogX] = ground;
+                    FrogY--;
+                    game_ground[FrogY, FrogX] = frog;
+                }
+
             }
         }
         static void DownArrowEvent() // Движение лягушки вниз
         {
             if (FrogY != (height - 1))
             {
-                game_ground[FrogY, FrogX] = ground;
-                FrogY++;
-                game_ground[FrogY, FrogX] = frog;
-            }
-        }
-
-        static void CarSearch() // Поиск машины в массиве и её передвижение
-        {
-            while (!game_over)
-            {
-                for (int i = 0; i < height - 1; i++)
+                if (game_ground[FrogY + 1, FrogX] == car)
                 {
-                    for (int j = 0; j < width - 1; j++)
-                    {
-                        if (game_ground[i, j] == car)
-                        {
-                            game_ground[i, j] = ground;
-                            if (game_ground[i, j - 1] == frog)
-                            {
-                                game_over = true;
-                            }
-                            if (j != 0)
-                                game_ground[i, j - 1] = car;
-                        }
-                        Console.Clear();
-                        PrintMap();
-                        Thread.Sleep(framerate);
-                    }
+                    ReturnFrogToStartPosition();
+                    life -= 1; // -жизнь
+                }
+                else
+                {
+                    game_ground[FrogY, FrogX] = ground;
+                    FrogY++;
+                    game_ground[FrogY, FrogX] = frog;
                 }
             }
         }
+
+        static void MoveCar() // Ставит автомобили, которые двигаются влево через определенные промежутки времени
+        {
+            Thread.Sleep(framerate);
+            CarSpawn();
+            if (sum == 2)
+            {
+                game_ground[13, 29] = car;
+                game_ground[13, 28] = car;
+                game_ground[13, 27] = car;
+                game_ground[10, 29] = car;
+                game_ground[10, 28] = car;
+                game_ground[10, 29] = car;
+            }
+            else if (sum == 10)
+            {
+                game_ground[9, 24] = car;
+                game_ground[9, 29] = car;
+                game_ground[9, 28] = car;
+                game_ground[9, 27] = car;
+                game_ground[9, 26] = car;
+                game_ground[9, 25] = car;
+                game_ground[15, 29] = car;
+                game_ground[15, 28] = car;
+                game_ground[15, 29] = car;
+                game_ground[15, 28] = car;
+                game_ground[10, 29] = car;
+                game_ground[10, 28] = car;
+                game_ground[10, 29] = car;
+                game_ground[10, 28] = car;
+            }
+            else if (sum == 5)
+            {
+                game_ground[12, 29] = car;
+                game_ground[12, 28] = car;
+                game_ground[12, 27] = car;
+                game_ground[12, 26] = car;
+                game_ground[12, 25] = car;
+                game_ground[9, 29] = car;
+                game_ground[9, 28] = car;
+            }
+            else if (sum == 15)
+            {
+                game_ground[14, 29] = car;
+                game_ground[14, 28] = car;
+                game_ground[14, 27] = car;
+                game_ground[14, 26] = car;
+                game_ground[11, 29] = car;
+                game_ground[11, 28] = car;
+
+            }
+            else if (sum == 20)
+            {
+                game_ground[15, 29] = car;
+                game_ground[15, 28] = car;
+                game_ground[15, 27] = car;
+                game_ground[15, 26] = car;
+                sum = 0; // обнуление счетчика
+            }
+            carsearch();
+            sum++;
+        }
+
+        static void carsearch() // Поиск машины в массиве и её передвижение
+        {
+
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    if (game_ground[i,j] == car) // поиск машины
+                    {
+                        game_ground[i,j] = ground;
+                        if (j != 0) // если столбец не равен 0 - двигать машину
+                        {
+
+                            // столкновение с машиной
+                            if (game_ground[i,j - 1] == frog)
+                            {
+                                ReturnFrogToStartPosition();
+                                life -= 1; // -жизнь
+                            }
+
+                            game_ground[i,j - 1] = car; // движение машины влево
+                        }
+                    }
+
+
+                }
+            }
+        }
+
+
         static void FrogMoveEvent() // Общий метод движения лягушки
         {
             while (!game_over)
@@ -205,16 +318,26 @@ namespace Frogger
                     Console.Clear();
                     PrintMap();
                 }
+                if (FrogY == 0)
+                {
+                    ReturnFrogToStartPosition();
+                    score += 50;
+                    life += 1;
+                    framerate -= 25;
+                }
+
             }
         }
 
-        static void EnvironmentEvent()
+        static void EnvironmentEvent() 
         {
             while (!game_over)
             {
-                CarSpawn();
-                CarSearch();
-                Thread.Sleep(framerate);
+                MoveCar();
+                Console.Clear();
+                PrintMap();
+                if (life <= 0)
+                    game_over = true;
             }
         }
 
